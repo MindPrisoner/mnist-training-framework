@@ -7,6 +7,12 @@ from datasets.mnist_dataset import get_mnist_dataloader
 from models.cnn import SimpleCNN
 from utils.seed import set_seed
 
+#假如TensorBoard
+
+from utils.logger import get_writer
+
+
+from engine.evaluator import evaluate
 
 def train():
 
@@ -29,6 +35,9 @@ def train():
         model.parameters(),
         lr=config.lr
     )
+
+    #step 2
+    writer = get_writer(config.log_dir)
 
     for epoch in range(config.epochs):
 
@@ -53,7 +62,25 @@ def train():
 
             total_loss += loss.item()
 
-        print(f"Epoch {epoch+1}, Loss: {total_loss:.4f}")
+        #print(f"Epoch {epoch+1}, Loss: {total_loss:.4f}")
+        #平均损失
+        avg_loss = total_loss / len(train_loader)
+
+        print(f"Epoch {epoch + 1}, Loss: {avg_loss:.4f}")
+
+        writer.add_scalar("Loss/train", avg_loss, epoch)
+        #准确率计算
+        acc = evaluate(model, test_loader, device)
+
+        print(f"Test Accuracy: {acc:.4f}")
+
+        writer.add_scalar("Accuracy/test", acc, epoch)
+
+
+
+    torch.save(model.state_dict(), config.model_save_path)
+
+    print("Model saved!")
 
 
 if __name__ == "__main__":

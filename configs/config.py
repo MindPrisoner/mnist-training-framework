@@ -11,3 +11,4 @@ class Config:
     model_save_path = "checkpoints/mnist_model.pt"
 
     log_dir = "runs/mnist"
+    model_save_path = "checkpoints/mnist_cnn.pth"
